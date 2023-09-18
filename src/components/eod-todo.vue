@@ -13,16 +13,16 @@
                 <input id="task" type="text" class="w-[40%] border-1 border-black outline-none px-4 py-1"
                     placeholder="Enter Tasks" v-model="listField">
                 <input id="hr" type="number" class="w-1/4 border-1 border-black outline-none px-4 py-1"
-                    placeholder="Enter Hours" v-model="hour">
+                    placeholder="Enter Hours" v-model="hour" @keyup.enter="addProjectList">
                 <input type="checkbox" name="" id="" class="inline-block text-xl w-5 h-5" v-model="isComplete">
                 <button @click="addProjectList"
                     class="border-1 border-transparent bg-rose-600 text-white text-sm font-sans font-extrabold px-4 py-[6px]">Add
                     Tasks</button>
             </div>
-            <div class="w-full pt-3 flex items-center space-x-3">
+            <!-- <div class="w-full pt-3 flex items-center space-x-3">
                 <button @click="eodSubmit"
                     class="border-1 border-transparent bg-rose-600 text-white text-sm font-sans font-extrabold px-4 py-[6px]">Done</button>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="mt-5 max-w-xl mx-auto px-8" v-for="(eod, index) in projectArray" :key="index">
@@ -31,7 +31,7 @@
             <ul class="ml-4 font-roboto list-disc font-medium">
                 <li class="flex items-center space-x-2" v-for="(list, index) in eod.taskItems">*&nbsp;{{
                     list.desc
-                }} {{ list.time }}h<i class="fa-solid text-lg ml-1"
+                }} {{ list.hr }}h<i class="fa-solid text-lg ml-1"
                         :class="{ 'text-green-500 fa-check': list.isDone, 'text-yellow-500 fa-clock': !list.isDone }"></i>
                 </li>
             </ul>
@@ -47,7 +47,10 @@ export default {
             listField: "",
             hour: "",
             isComplete: false,
-            projectObject: {},
+            projectObject: {
+                projTitle: "",
+                taskItems: []
+            },
             projectArray: [],
             lists: []
         }
@@ -55,31 +58,31 @@ export default {
     methods: {
         addProjectTitle() {
             if (this.projTitle) {
+                this.projectObject = {
+                    projTitle: "",
+                    taskItems: []
+                }
                 this.projectObject.projTitle = this.projTitle
-                // this.projTitle = ""
             }
         },
         addProjectList() {
             if (this.listField && this.hour) {
                 this.addProjectTitle()
-                this.lists.push({
-                    desc: this.listField,
-                    time: this.hour,
-                    isDone: this.isComplete
-                })
-                this.listField = ""
-                this.hour = ""
-                this.isComplete = false
-                this.projectObject.taskItems = this.lists
-            }
-        },
-        eodSubmit() {
-            if (this.projTitle && this.lists.length > 0) {
-                this.projectArray.push(this.projectObject)
-                this.lists = []
-                this.projectObject = {}
-                this.projTitle = ""
-                console.log(this.projectArray);
+                if (this.projTitle) {
+                    this.projectArray.push(this.projectObject)
+                    this.projTitle = ""
+                }
+                if (!this.projTitle) {
+                    this.projectArray[this.projectArray.length - 1].taskItems.push({
+                        desc: this.listField,
+                        hr: this.hour,
+                        isDone: this.isComplete
+                    })
+                    this.listField = ""
+                    this.hour = ""
+                    this.isComplete = false
+                }
+                // console.log(this.projectArray);
             }
         }
     }
